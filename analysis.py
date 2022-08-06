@@ -1,11 +1,15 @@
+import os
 import re
 import json
 import codecs
 
 import numpy as np
 import arabic_reshaper
-from wordcloud import WordCloud
+from wordcloud import WordCloud, STOPWORDS
 from bidi.algorithm import get_display
+from dotenv import load_dotenv
+
+import main
 
 
 class WordCloudFa():
@@ -56,20 +60,22 @@ class WordCloudFa():
             u"\u200c"
             u"\u2068"
             u"\u2067"
-            'A-z'
-            '@'
-            '//'
             "]+", flags=re.UNICODE
         )
-        clean_text = weridPatterns.sub(r'', text)
-        codecs.open('text.txt', 'w', 'utf-8').write(clean_text)
+        replies_filter = re.compile(r'(@\S+)|(https://\S+)')
+
+        clean_text = weridPatterns.sub('', text)
+        clean_text = replies_filter.sub('', clean_text)
+        final_preprocessing = clean_text.replace('ي', 'ی')
+        codecs.open('text.txt', 'w', 'utf-8').write(final_preprocessing)
 
         return clean_text
 
     def generate(self, text: str, save_file_name: str) -> None:
         text = get_display(arabic_reshaper.reshape(text))
 
-        self.wc.stopwords = self.rewrite_stopwords()
+        persian_stopwords = self.rewrite_stopwords()
+        self.wc.stopwords.update(persian_stopwords)
 
         x, y = np.ogrid[:self.mask_pixel, :self.mask_pixel]
 
@@ -85,7 +91,9 @@ class WordCloudFa():
 
 
 if __name__ == '__main__':
-    file_name = ''
+    load_dotenv()
+    file_name = os.environ['USERNAME_FILE']
+
     with open(f'{file_name}.json', 'r', encoding='utf-8') as file:
         tweets = json.loads(file.read())
 
@@ -98,7 +106,9 @@ if __name__ == '__main__':
     wc = WordCloud(
         font_path='fonts/Shabnam/Shabnam.ttf',
         background_color='white',
+        stopwords=STOPWORDS,
         collocations=False,
+        max_words=100
     )
     wcfa = WordCloudFa(wc=wc, stopwords_file='stop.txt', mask_pixel=1000)
     text = wcfa.preprocessing_text(text)

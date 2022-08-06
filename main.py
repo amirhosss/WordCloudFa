@@ -57,6 +57,7 @@ class User():
 if __name__ == '__main__':
     load_dotenv()
     TOKEN = os.environ.get('TOKEN')
+    USERNAME = os.environ.get('USERNAME_FILE')
 
     my_client = Client(
     username_url='https://api.twitter.com/2/users/by/username/',
@@ -64,7 +65,7 @@ if __name__ == '__main__':
     bearer_token=TOKEN,
     proxy={'https': 'http://127.0.0.1:10809'}
     )
-    user = User('')
+    user = User(USERNAME)
 
     data = list(itertools.chain(*user.get_tweets(my_client, 
     params={'max_results': 100})))
