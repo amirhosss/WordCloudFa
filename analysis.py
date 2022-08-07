@@ -37,7 +37,7 @@ class WordCloudFa():
         return stopwords
 
     def preprocessing_text(self, text: str) -> str:
-        weridPatterns = re.compile(
+        werid_patterns = re.compile(
             "["
             u"\U0001F600-\U0001F64F"  # emoticons
             u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -64,12 +64,17 @@ class WordCloudFa():
         )
         replies_filter = re.compile(r'(@\S+)|(https://\S+)|([^0-9a-zA-Z\u0621-\u06CC\n ]+)')
 
-        clean_text = re.sub('\n ', '\n', weridPatterns.sub('', text))
+        clean_text = werid_patterns.sub('', text)
         clean_text = replies_filter.sub('', clean_text)
-        final_preprocessing = clean_text.replace('ي', 'ی')
+
+        convert_chars = [['ي', 'ی'], ['\u0643', 'ک']]
+        for pair in convert_chars:
+            final_preprocessing = clean_text.replace(pair[0], pair[1])
+            
+        final_preprocessing = final_preprocessing.replace('\n ', '\n').replace('\nRT  ', '\n')
         codecs.open('text.txt', 'w', 'utf-8').write(final_preprocessing)
 
-        return clean_text
+        return final_preprocessing
 
     def generate(self, text: str, save_file_name: str) -> None:
         text = get_display(arabic_reshaper.reshape(text))
