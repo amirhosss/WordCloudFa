@@ -62,9 +62,9 @@ class WordCloudFa():
             u"\u2067"
             "]+", flags=re.UNICODE
         )
-        replies_filter = re.compile(r'(@\S+)|(https://\S+)')
+        replies_filter = re.compile(r'(@\S+)|(https://\S+)|([^0-9a-zA-Z\u0621-\u06CC\n ]+)')
 
-        clean_text = weridPatterns.sub('', text)
+        clean_text = re.sub('\n ', '\n', weridPatterns.sub('', text))
         clean_text = replies_filter.sub('', clean_text)
         final_preprocessing = clean_text.replace('ي', 'ی')
         codecs.open('text.txt', 'w', 'utf-8').write(final_preprocessing)
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     load_dotenv()
     file_name = os.environ['USERNAME_FILE']
 
-    with open(f'{file_name}.json', 'r', encoding='utf-8') as file:
+    with open(f'../Data/{file_name}.json', 'r', encoding='utf-8') as file:
         tweets = json.loads(file.read())
 
     all_tweets = []
@@ -112,4 +112,4 @@ if __name__ == '__main__':
     )
     wcfa = WordCloudFa(wc=wc, stopwords_file='stop.txt', mask_pixel=1000)
     text = wcfa.preprocessing_text(text)
-    wcfa.generate(text=text, save_file_name=f'{file_name}.png')
+    wcfa.generate(text=text, save_file_name=f'../Data/{file_name}.png')
