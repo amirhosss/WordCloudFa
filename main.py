@@ -70,5 +70,5 @@ if __name__ == '__main__':
     data = list(itertools.chain(*user.get_tweets(my_client, 
     params={'max_results': 100})))
 
-    with open(f'{user.username}.json', 'w') as file:
+    with open(f'../Data/{user.username}.json', 'w') as file:
         file.write(json.dumps(data, indent=0))
