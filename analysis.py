@@ -70,7 +70,7 @@ class WordCloudFa():
         convert_chars = [['ي', 'ی'], ['\u0643', 'ک']]
         for pair in convert_chars:
             final_preprocessing = clean_text.replace(pair[0], pair[1])
-            
+
         final_preprocessing = final_preprocessing.replace('\n ', '\n').replace('\nRT  ', '\n')
         codecs.open('text.txt', 'w', 'utf-8').write(final_preprocessing)
 
@@ -80,7 +80,11 @@ class WordCloudFa():
         text = get_display(arabic_reshaper.reshape(text))
 
         persian_stopwords = self.rewrite_stopwords()
-        self.wc.stopwords.update(persian_stopwords)
+        en_stopwords = set()
+        for word in self.wc.stopwords:
+            converted_word = word.replace("'", '')
+            en_stopwords.add(converted_word)
+        self.wc.stopwords = set([*en_stopwords, *persian_stopwords])
 
         x, y = np.ogrid[:self.mask_pixel, :self.mask_pixel]
 
