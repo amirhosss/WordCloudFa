@@ -9,8 +9,6 @@ from wordcloud import WordCloud, STOPWORDS
 from bidi.algorithm import get_display
 from dotenv import load_dotenv
 
-import main
-
 
 class WordCloudFa():
     def __init__(self, wc: WordCloud, stopwords_file: str, mask_pixel: int) -> None:
@@ -104,13 +102,22 @@ if __name__ == '__main__':
     file_name = os.environ['USERNAME_FILE']
 
     with open(f'../Data/{file_name}.json', 'r', encoding='utf-8') as file:
-        tweets = json.loads(file.read())
+        # tweets = json.loads(file.read()) # Twitter data
+        messages = json.loads(file.read())['messages'] # Telegram data
 
-    all_tweets = []
-    for tweet in tweets:
-        all_tweets.append(tweet['text'])
+    # all_tweets = []
+    # for tweet in tweets:
+    #     all_tweets.append(tweet['text'])
 
-    text = '\n'.join(all_tweets)
+    # text = '\n'.join(all_tweets)
+
+    all_messages = []
+    for message in messages:
+        text = message['text']
+        if type(text) is str and text:
+            all_messages.append(text)
+
+    text = '\n'.join(all_messages)
 
     wc = WordCloud(
         font_path='fonts/Shabnam/Shabnam.ttf',
@@ -119,6 +126,7 @@ if __name__ == '__main__':
         collocations=False,
         max_words=100
     )
+
     wcfa = WordCloudFa(wc=wc, stopwords_file='stop.txt', mask_pixel=1000)
     text = wcfa.preprocessing_text(text)
     wcfa.generate(text=text, save_file_name=f'../Data/{file_name}.png')
